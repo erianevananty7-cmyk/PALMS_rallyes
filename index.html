@@ -75,17 +75,26 @@ tailwind.config = {
   </div>
 </div>
 
-<nav class="sticky top-0 z-[500] flex items-center justify-center px-4 sm:px-10 py-[0.9rem] bg-cream/90 backdrop-blur-[16px] border-b border-p-teal/[0.18]">
+<div id="error-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+  <div id="error-modal-inner" class="relative bg-white rounded-3xl p-10 max-w-sm w-full text-center shadow-2xl animate-pop">
+    <button id="btn-error-close" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer text-ink-muted hover:text-ink hover:bg-gray-100 transition-colors text-lg">✕</button>
+    <span id="error-modal-emoji" class="text-5xl block mb-4"></span>
+    <h3 id="error-modal-title" class="font-syne font-extrabold text-2xl text-p-coral mb-2"></h3>
+    <p id="error-modal-text" class="text-ink-soft text-sm leading-relaxed"></p>
+    <button id="btn-error-ok" class="mt-6 inline-block bg-gradient-to-r from-p-coral to-p-sunset text-white font-dm font-medium text-sm border-0 cursor-pointer px-8 py-2.5 rounded-full shadow-md hover:-translate-y-0.5 transition-transform duration-150">OK</button>
+  </div>
+</div>
+
+<nav class="sticky top-0 z-[500] relative flex items-center justify-center px-4 sm:px-10 py-[0.9rem] bg-cream/90 backdrop-blur-[16px] border-b border-p-teal/[0.18]">
+  <div id="status-banner" class="hidden absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full">
+    <span id="status-dot" class="w-2 h-2 rounded-full flex-shrink-0"></span>
+    <span id="status-text" class="hidden sm:inline text-[0.75rem] font-dm font-medium"></span>
+  </div>
   <button type="button" data-scroll-to="hero" class="flex items-center gap-3 border-0 bg-transparent cursor-pointer p-0">
     <img src="logo.png" alt="PALMS" class="w-[42px] h-[42px] rounded-full object-cover border-2 border-p-yellow">
     <span class="font-syne font-extrabold text-[1.55rem] tracking-[-1px] bg-[linear-gradient(100deg,#E8A800,#FF6B6B,#00C9C8)] bg-clip-text text-transparent">PALMS 🐊</span>
   </button>
 </nav>
-
-<div id="status-banner" class="hidden w-full px-4 py-2.5 text-center text-[0.85rem] font-dm font-medium">
-  <span id="status-dot" class="inline-block w-2 h-2 rounded-full mr-2 align-middle"></span>
-  <span id="status-text"></span>
-</div>
 
 <section id="hero" class="relative z-[1] text-center overflow-hidden py-20 px-6 bg-[linear-gradient(160deg,#C8F6F5_0%,#FFF3D4_45%,#FFE5D0_80%,#FFD6E8_100%)]">
   <div class="absolute w-[400px] h-[400px] rounded-full bg-p-teal opacity-[0.18] pointer-events-none -top-[150px] -left-[100px]"></div>
@@ -292,9 +301,6 @@ tailwind.config = {
         Envoyer ma demande 🐊
       </button>
 
-      <div id="error-msg" class="hidden mt-4 bg-red-50 border border-red-200 rounded-xl px-[1.2rem] py-[0.9rem] text-p-coral text-[0.88rem] text-center">
-        Oups ! Une erreur est survenue. Réessaie ou contacte-nous directement sur Instagram.
-      </div>
 
     </form>
   </div>
