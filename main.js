@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxr-uifHyjKGvsELXRQVKK926UQZwxiLm8QF7TLQpgvHdbCbsJtW8mC60M0TGlcpQnX/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMeE3Duvbb3REBsXQNJEciuKeUDI-X9bQdgcfJKRaeYpzHB_POSbSA0d65MuxciWrsjw/exec";
 const RATE_LIMIT_MS   = 60_000;
 
 const SERVICES = [
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.getElementById('palms-form').reset();
   document.getElementById('success-modal').classList.add('hidden');
-  document.getElementById('error-msg').classList.add('hidden');
 
   populateSelect('service', SERVICES);
   populateSelect('membre', MEMBRES);
@@ -141,12 +140,10 @@ function bindForm() {
   document.getElementById('palms-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const btn     = document.getElementById('submit-btn');
-    const errorEl = document.getElementById('error-msg');
+    const btn = document.getElementById('submit-btn');
 
     if (serviceStatus === 'closed') {
-      errorEl.textContent = 'Les rallyes ne sont pas disponibles en ce moment. Réessaie plus tard !';
-      errorEl.classList.remove('hidden');
+      showErrorModal('🚫', 'Service fermé', 'Les rallyes ne sont pas disponibles ce soir.<br>Repassez plus tard !');
       return;
     }
 
@@ -155,15 +152,12 @@ function bindForm() {
     const lastSubmit = parseInt(localStorage.getItem('palms_last_submit') || '0', 10);
     if (Date.now() - lastSubmit < RATE_LIMIT_MS) {
       const remaining = Math.ceil((RATE_LIMIT_MS - (Date.now() - lastSubmit)) / 1000);
-      errorEl.textContent = `Tu viens d'envoyer une demande. Réessaie dans ${remaining} seconde${remaining > 1 ? 's' : ''}.`;
-      errorEl.classList.remove('hidden');
+      showErrorModal('⏳', 'Pas si vite !', `Tu viens d'envoyer une demande.<br>Réessaie dans ${remaining} seconde${remaining > 1 ? 's' : ''}.`);
       return;
     }
 
     btn.disabled = true;
     btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin align-middle mr-1.5"></span>Envoi en cours…`;
-    errorEl.textContent = 'Oups ! Une erreur est survenue. Réessaie ou contacte-nous directement sur Instagram.';
-    errorEl.classList.add('hidden');
 
     const payload = {
       prenom:    document.getElementById('prenom').value.trim(),
@@ -177,12 +171,22 @@ function bindForm() {
     };
 
     try {
-      await fetch(APPS_SCRIPT_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body:    JSON.stringify(payload),
+      const params = new URLSearchParams({
+        action:    'submit',
+        prenom:    payload.prenom,
+        nom:       payload.nom,
+        telephone: payload.telephone,
+        adresse:   payload.adresse,
+        service:   payload.service,
+        heure:     payload.heure,
+        membre:    payload.membre,
+        details:   payload.details,
       });
+
+      const res  = await fetch(`${APPS_SCRIPT_URL}?${params}`);
+      const data = await res.json();
+
+      if (data.status !== 'ok') throw new Error('Apps Script error');
 
       localStorage.setItem('palms_last_submit', Date.now().toString());
       e.target.reset();
@@ -190,7 +194,7 @@ function bindForm() {
 
     } catch (err) {
       console.error(err);
-      errorEl.classList.remove('hidden');
+      showErrorModal('😕', 'Une erreur est survenue', 'Réessaie ou contacte-nous<br>directement sur Instagram.');
 
     } finally {
       btn.disabled = false;
@@ -210,17 +214,37 @@ function bindScrollButtons() {
 
 function bindModal() {
   const modal = document.getElementById('success-modal');
-
   document.getElementById('btn-modal-close').addEventListener('click', closeModal);
   document.getElementById('btn-modal-ok').addEventListener('click', closeModal);
-
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  const errorModal = document.getElementById('error-modal');
+  document.getElementById('btn-error-close').addEventListener('click', closeErrorModal);
+  document.getElementById('btn-error-ok').addEventListener('click', closeErrorModal);
+  errorModal.addEventListener('click', e => { if (e.target === errorModal) closeErrorModal(); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); closeErrorModal(); }
+  });
 }
 
 function closeModal() {
   document.getElementById('success-modal').classList.add('hidden');
+}
+
+function showErrorModal(emoji, title, text) {
+  document.getElementById('error-modal-emoji').textContent = emoji;
+  document.getElementById('error-modal-title').textContent = title;
+  document.getElementById('error-modal-text').innerHTML   = text;
+  const inner = document.getElementById('error-modal-inner');
+  inner.classList.remove('animate-pop');
+  void inner.offsetWidth;
+  inner.classList.add('animate-pop');
+  document.getElementById('error-modal').classList.remove('hidden');
+}
+
+function closeErrorModal() {
+  document.getElementById('error-modal').classList.add('hidden');
 }
 
 async function loadStatus() {
@@ -230,11 +254,6 @@ async function loadStatus() {
     const data = await res.json();
     if (!['open', 'closed'].includes(data.status)) return;
 
-    if (serviceStatus !== null && data.status !== serviceStatus) {
-      location.reload();
-      return;
-    }
-
     serviceStatus = data.status;
     const isOpen = data.status === 'open';
     const banner = document.getElementById('status-banner');
@@ -242,16 +261,14 @@ async function loadStatus() {
     const text   = document.getElementById('status-text');
 
     banner.className = isOpen
-      ? 'w-full px-4 py-2.5 text-center text-[0.85rem] font-dm font-medium border-b bg-p-green/10 border-p-green/30 text-[#276b2c]'
-      : 'w-full px-4 py-2.5 text-center text-[0.85rem] font-dm font-medium border-b bg-p-coral/10 border-p-coral/30 text-p-coral';
+      ? 'absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full border bg-p-green/10 border-p-green/30 text-[#276b2c]'
+      : 'absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full border bg-p-coral/10 border-p-coral/30 text-p-coral';
 
     dot.className = isOpen
-      ? 'inline-block w-2 h-2 rounded-full mr-2 align-middle bg-p-green animate-pulse'
-      : 'inline-block w-2 h-2 rounded-full mr-2 align-middle bg-p-coral';
+      ? 'w-2 h-2 rounded-full flex-shrink-0 bg-p-green animate-pulse'
+      : 'w-2 h-2 rounded-full flex-shrink-0 bg-p-coral';
 
-    text.textContent = isOpen
-      ? (data.message || 'Les rallyes sont disponibles ce soir !')
-      : (data.message || 'Les rallyes ne sont pas disponibles ce soir.');
+    text.textContent = isOpen ? 'Rallyes disponibles' : 'Rallyes indisponibles';
   } catch {
     // Bandeau masqué si le statut est inaccessible
   }
