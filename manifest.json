@@ -1,0 +1,19 @@
+{
+  "name": "PALMS BDE",
+  "short_name": "PALMS",
+  "description": "Les rallyes de PALMS BDE - à votre service !",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFBF0",
+  "theme_color": "#00C9C8",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

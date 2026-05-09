@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PALMS BDE</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00C9C8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PALMS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream:       '#FFFBF0',
+        sand:        '#FFF3D4',
+        'p-yellow':  '#FFD93D',
+        'p-yd':      '#E8A800',
+        'p-teal':    '#00C9C8',
+        'p-teal-l':  '#C8F6F5',
+        'p-teal-d':  '#008A8A',
+        'p-green':   '#5DBB63',
+        'p-coral':   '#FF6B6B',
+        'p-sunset':  '#FF8C69',
+        'ink':       '#1E3A2F',
+        'ink-soft':  '#4A6E5E',
+        'ink-muted': '#7A9E8E',
+      },
+      fontFamily: {
+        syne: ['Syne', 'sans-serif'],
+        dm:   ['"DM Sans"', 'sans-serif'],
+      },
+      keyframes: {
+        float: {
+          '0%,100%': { transform: 'translateY(0)' },
+          '50%':     { transform: 'translateY(-10px)' },
+        },
+        pop: {
+          '0%':   { transform: 'scale(0)' },
+          '80%':  { transform: 'scale(1.15)' },
+          '100%': { transform: 'scale(1)' },
+        },
+      },
+      animation: {
+        float: 'float 4s ease-in-out infinite',
+        pop:   'pop 0.4s ease both',
+      },
+    },
+  },
+};
+</script>
+</head>
+
+<body class="font-dm bg-cream text-ink overflow-x-hidden min-h-screen">
+
+<div class="fixed -top-[200px] -right-[200px] w-[600px] h-[600px] rounded-full pointer-events-none z-0
+            bg-[radial-gradient(circle,rgba(0,201,200,0.12)_0%,transparent_70%)]"></div>
+<div class="fixed -bottom-[200px] -left-[200px] w-[600px] h-[600px] rounded-full pointer-events-none z-0
+            bg-[radial-gradient(circle,rgba(255,217,61,0.10)_0%,transparent_70%)]"></div>
+
+<div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+  <div class="relative bg-white rounded-3xl p-10 max-w-sm w-full text-center shadow-2xl animate-pop">
+    <button id="btn-modal-close" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer text-ink-muted hover:text-ink hover:bg-gray-100 transition-colors text-lg">✕</button>
+    <span class="text-5xl block mb-4">🎉</span>
+    <h3 class="font-syne font-extrabold text-2xl text-p-teal-d mb-2">Demande reçue !</h3>
+    <p class="text-ink-soft text-sm leading-relaxed">Les PALMS ont bien reçu ta demande.<br>On te contacte très vite pour confirmer. 🌴</p>
+    <button id="btn-modal-ok" class="mt-6 inline-block bg-gradient-to-r from-p-teal to-p-green text-white font-dm font-medium text-sm border-0 cursor-pointer px-8 py-2.5 rounded-full shadow-md hover:-translate-y-0.5 transition-transform duration-150">Super !</button>
+  </div>
+</div>
+
+<nav class="sticky top-0 z-[500] flex items-center justify-center px-4 sm:px-10 py-[0.9rem] bg-cream/90 backdrop-blur-[16px] border-b border-p-teal/[0.18]">
+  <button type="button" data-scroll-to="hero" class="flex items-center gap-3 border-0 bg-transparent cursor-pointer p-0">
+    <img src="logo.png" alt="PALMS" class="w-[42px] h-[42px] rounded-full object-cover border-2 border-p-yellow">
+    <span class="font-syne font-extrabold text-[1.55rem] tracking-[-1px] bg-[linear-gradient(100deg,#E8A800,#FF6B6B,#00C9C8)] bg-clip-text text-transparent">PALMS 🐊</span>
+  </button>
+</nav>
+
+<div id="status-banner" class="hidden w-full px-4 py-2.5 text-center text-[0.85rem] font-dm font-medium">
+  <span id="status-dot" class="inline-block w-2 h-2 rounded-full mr-2 align-middle"></span>
+  <span id="status-text"></span>
+</div>
+
+<section id="hero" class="relative z-[1] text-center overflow-hidden py-20 px-6 bg-[linear-gradient(160deg,#C8F6F5_0%,#FFF3D4_45%,#FFE5D0_80%,#FFD6E8_100%)]">
+  <div class="absolute w-[400px] h-[400px] rounded-full bg-p-teal opacity-[0.18] pointer-events-none -top-[150px] -left-[100px]"></div>
+  <div class="absolute w-[280px] h-[280px] rounded-full bg-p-yellow opacity-[0.18] pointer-events-none -bottom-[100px] -right-[60px]"></div>
+
+  <img src="logo.png" alt="PALMS" class="relative w-[140px] h-[140px] rounded-full object-cover border-4 border-p-yellow mx-auto mb-6 block shadow-[0_8px_40px_rgba(232,168,0,0.22)] animate-float">
+
+  <div class="inline-block bg-p-teal/[0.13] border border-p-teal/35 text-p-teal-d px-4 py-[0.28rem] rounded-full text-[0.8rem] font-medium tracking-[0.4px] mb-[1.3rem]">✦ BDE à votre service ✦</div>
+
+  <h1 class="font-syne font-extrabold text-[clamp(2.6rem,8vw,5rem)] leading-[1.05] tracking-[-2px] text-ink mb-5">
+    On s'en <span class="text-p-yd">occupe</span>,<br><span class="text-p-teal-d">détendez</span> vous.
+  </h1>
+
+  <p class="text-[1.08rem] text-ink-soft max-w-[480px] mx-auto mb-10 leading-[1.7]">
+    Courses, livraisons, car wash, cigarettes, taxi …<br>Dites-nous ce dont vous avez besoin et la team PALMS s'en charge.
+  </p>
+
+  <div class="flex gap-4 justify-center flex-wrap">
+    <button type="button" data-scroll-to="commande"
+            class="font-dm font-medium text-base border-0 cursor-pointer
+                   bg-gradient-to-br from-p-yellow to-p-sunset text-white
+                   px-[2.3rem] py-[0.92rem] rounded-full
+                   shadow-[0_4px_24px_rgba(232,168,0,0.28)]
+                   hover:-translate-y-[3px] hover:shadow-[0_8px_36px_rgba(232,168,0,0.38)]
+                   transition-all duration-150">
+      Passer une commande 🏄
+    </button>
+    <button type="button" data-scroll-to="services"
+            class="font-dm font-medium text-base border-0 cursor-pointer
+                   bg-white text-p-teal-d border-2 border-p-teal
+                   px-[2.3rem] py-[0.92rem] rounded-full
+                   hover:bg-p-teal-l transition-colors duration-150">
+      Voir les services
+    </button>
+  </div>
+  <svg viewBox="0 0 1440 56" preserveAspectRatio="none" class="absolute bottom-0 left-0 w-full h-14">
+    <path d="M0,28 C240,56 480,0 720,28 C960,56 1200,0 1440,28 L1440,56 L0,56 Z" fill="white"/>
+  </svg>
+</section>
+
+<section id="services" class="relative z-[1] overflow-hidden bg-gradient-to-b from-white to-sand">
+  <div class="max-w-[960px] mx-auto px-6 py-16 opacity-0 translate-y-7 transition-all duration-[650ms] ease-in-out" data-fade>
+    <p class="text-[0.76rem] tracking-[2.5px] text-p-teal-d font-medium uppercase mb-[0.6rem]">Nos services</p>
+    <h2 class="font-syne font-extrabold text-[clamp(1.8rem,4.5vw,2.8rem)] tracking-[-1px] text-ink mb-9 leading-[1.15]">Ce qu'on peut faire pour toi 👇</h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-[1.1rem]">
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🛒</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Courses</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">On te ramène ce qu'il faut.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🍕</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Uber Eats</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">T'as faim mais t'as la flemme ? On récupère ta commande.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🚗</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Car Wash</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">Ta caisse a besoin d'amour ? On s'en occupe.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🚬</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Cigarettes</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">On te ramène tes clopes sans que tu bouges de chez toi.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🚕</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Taxi</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">Besoin d'un trajet ? On te dépose là où tu veux.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🎁</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Rallye Surprise</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">Appelle-nous, on s'occupe du reste.</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🧹</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Ménage</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">Besoin d'un petit coup de propre ?</p>
+      </div>
+
+      <div class="group relative bg-white border-[1.5px] border-p-teal/[0.18] rounded-[22px] pt-[1.6rem] px-[1.3rem] pb-[1.4rem] overflow-hidden cursor-default hover:-translate-y-[6px] hover:shadow-[0_12px_40px_rgba(0,201,200,0.12)] hover:border-p-teal transition-all duration-[220ms]">
+        <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-[22px] bg-gradient-to-r from-p-teal to-p-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-[220ms]"></div>
+        <span class="text-[2.1rem] mb-[0.9rem] block">🍽️</span>
+        <h3 class="font-syne font-bold text-[1.02rem] text-ink mb-[0.4rem]">Vaisselle</h3>
+        <p class="text-[0.84rem] text-ink-muted leading-[1.55]">Pas envie de laver ta vaisselle ? On s'en charge.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="commande" class="relative z-[1] overflow-hidden border-b border-p-teal/[0.18] bg-[linear-gradient(160deg,rgba(200,246,245,0.4)_0%,rgba(255,243,212,0.6)_100%)]">
+  <svg viewBox="0 0 1440 56" preserveAspectRatio="none" class="absolute top-0 left-0 w-full h-14">
+    <path d="M0,28 C360,0 1080,56 1440,28 L1440,0 L0,0 Z" fill="#FFF3D4"/>
+  </svg>
+  <div class="max-w-[960px] mx-auto px-6 py-16 opacity-0 translate-y-7 transition-all duration-[650ms] ease-in-out" data-fade>
+
+    <div class="text-center mb-8">
+      <p class="text-[0.76rem] tracking-[2.5px] text-p-teal-d font-medium uppercase mb-[0.6rem]">Commander</p>
+      <h2 class="font-syne font-extrabold text-[clamp(1.7rem,4vw,2.4rem)] tracking-[-1px] text-ink mb-3">Fais ta demande 🌴</h2>
+      <p class="text-ink-soft text-[0.95rem] max-w-[420px] mx-auto leading-relaxed">Remplis le formulaire, on te contacte pour confirmer. C'est tout !</p>
+    </div>
+
+    <form id="palms-form" autocomplete="off" novalidate class="max-w-[680px] mx-auto bg-white rounded-[28px] py-[2.5rem] px-[2rem] border-[1.5px] border-p-teal/[0.18] shadow-[0_8px_48px_rgba(0,201,200,0.08)]">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+
+        <div class="flex flex-col gap-[0.4rem]">
+          <label for="prenom" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Prénom <span class="text-red-500">*</span></label>
+          <input type="text" id="prenom" name="prenom" placeholder="Ton prénom" autocomplete="given-name" spellcheck="false"
+                 class="bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] text-ink font-dm text-[0.95rem] w-full outline-none transition-all duration-200 placeholder:text-ink-muted focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+          <p id="err-prenom" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem]">
+          <label for="nom" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Nom <span class="text-red-500">*</span></label>
+          <input type="text" id="nom" name="nom" placeholder="Ton nom" autocomplete="family-name" spellcheck="false"
+                 class="bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] text-ink font-dm text-[0.95rem] w-full outline-none transition-all duration-200 placeholder:text-ink-muted focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+          <p id="err-nom" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem]">
+          <label for="tel" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Téléphone <span class="text-red-500">*</span></label>
+          <input type="tel" id="tel" name="telephone" placeholder="0x xx xx xx xx" autocomplete="tel" inputmode="tel"
+                 class="bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] text-ink font-dm text-[0.95rem] w-full outline-none transition-all duration-200 placeholder:text-ink-muted focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+          <p id="err-tel" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem] sm:col-span-2">
+          <label for="adresse" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Adresse de livraison / récupération <span class="text-red-500">*</span></label>
+          <input type="text" id="adresse" name="adresse" placeholder="12 rue des étudiants, bâtiment B…" autocomplete="street-address"
+                 class="bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] text-ink font-dm text-[0.95rem] w-full outline-none transition-all duration-200 placeholder:text-ink-muted focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+          <p id="err-adresse" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem]">
+          <label for="service" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Type de service <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <select id="service" name="service" class="appearance-none bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] pr-10 text-ink font-dm text-[0.95rem] w-full outline-none cursor-pointer transition-all duration-200 focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none w-3 h-2 text-p-teal" viewBox="0 0 12 8" fill="none">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p id="err-service" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem]">
+          <label for="heure" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Créneau souhaité <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <select id="heure" name="heure" class="appearance-none bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] pr-10 text-ink font-dm text-[0.95rem] w-full outline-none cursor-pointer transition-all duration-200 focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+              <option value="">— Choisis un créneau —</option>
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none w-3 h-2 text-p-teal" viewBox="0 0 12 8" fill="none">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p id="err-heure" class="hidden text-[#FF6B6B] text-[0.78rem]"></p>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem] sm:col-span-2">
+          <label for="membre" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Tu veux que ce soit qui ? <span class="text-ink-muted font-normal">(optionnel)</span></label>
+          <div class="relative">
+            <select id="membre" name="membre" class="appearance-none bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] pr-10 text-ink font-dm text-[0.95rem] w-full outline-none cursor-pointer transition-all duration-200 focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]">
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none w-3 h-2 text-p-teal" viewBox="0 0 12 8" fill="none">
+              <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-[0.4rem] sm:col-span-2">
+          <label for="details" class="text-[0.82rem] font-medium text-ink-soft tracking-[0.2px]">Détails de la demande <span class="text-ink-muted font-normal">(optionnel)</span></label>
+          <textarea id="details" name="details" rows="4" placeholder="Quantités, adresses spécifiques, instructions particulières…"
+                    class="bg-cream border-[1.5px] border-p-teal/20 rounded-xl px-4 py-[0.78rem] text-ink font-dm text-[0.95rem] w-full outline-none resize-y min-h-[105px] transition-all duration-200 placeholder:text-ink-muted focus:border-p-teal focus:bg-white focus:shadow-[0_0_0_3px_rgba(0,201,200,0.1)]"></textarea>
+        </div>
+
+      </div>
+
+      <button type="submit" id="submit-btn"
+              class="w-full mt-[1.4rem] font-dm font-medium text-[1.05rem] border-0 cursor-pointer
+                     bg-gradient-to-br from-p-teal to-p-green text-white
+                     py-[1.05rem] rounded-full tracking-[0.2px]
+                     shadow-[0_4px_24px_rgba(0,201,200,0.3)]
+                     hover:-translate-y-0.5 hover:shadow-[0_8px_36px_rgba(0,201,200,0.4)]
+                     active:scale-[0.98] transition-all duration-150
+                     disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none">
+        Envoyer ma demande 🐊
+      </button>
+
+      <div id="error-msg" class="hidden mt-4 bg-red-50 border border-red-200 rounded-xl px-[1.2rem] py-[0.9rem] text-p-coral text-[0.88rem] text-center">
+        Oups ! Une erreur est survenue. Réessaie ou contacte-nous directement sur Instagram.
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<footer class="relative z-[1] bg-gradient-to-r from-p-teal-l to-sand border-t border-p-teal/[0.18] py-10 px-6 text-center">
+  <div class="font-syne font-extrabold text-[1.2rem] inline-block mb-[0.4rem] bg-[linear-gradient(90deg,#E8A800,#FF6B6B,#00C9C8)] bg-clip-text text-transparent">PALMS 🐊</div>
+  <p class="text-ink-muted text-[0.82rem]">BDE — Toujours là pour toi</p>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
