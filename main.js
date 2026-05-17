@@ -69,8 +69,8 @@ function populateSelect(id, options) {
 
 function generateSlots() {
   const select = document.getElementById('heure');
-  let h = 19, m = 30;
-  while (h < 21 || (h === 21 && m <= 30)) {
+  let h = 19;
+  while (h < 21 || (h === 21)) {
     const opt = document.createElement('option');
     opt.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     opt.textContent = `🕒 ${opt.value}`;
